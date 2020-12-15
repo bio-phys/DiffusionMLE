@@ -1,10 +1,5 @@
-module BasicFunctions
+#= Make increments Δ from time series X: =#
 
-export make_increments, Thomas_algorithm!, log_det, dlog_det, ddlog_det
-
-
-
-#= Make increments Δ from time series X =#
 function make_increments(d::Int64, N::Int64, X::Array{Float64,2})
     Δ = zeros(N,d)
     @inbounds for n = 1 : d
@@ -15,8 +10,10 @@ function make_increments(d::Int64, N::Int64, X::Array{Float64,2})
     return Δ
 end
 
-#= Compute Y = Σ^-1*Δ for a symmetric tridiagonal Toeplitz matrix Σ 
-   with diagonal elements α and off-diagonal elements β =#
+
+
+#= Compute Y = Σ^-1*Δ for a symmetric tridiagonal Toeplitz matrix Σ with diagonal elements α and off-diagonal elements β: =#
+
 function Thomas_algorithm!(N::Int64, α::Float64, β::Float64, Δ::AbstractArray{Float64,1}, c::Array{Float64,1}, Y::Array{Float64,1})
     @inbounds c[1] = β/α
     @inbounds Y[1] = Δ[1]/α
@@ -30,7 +27,10 @@ function Thomas_algorithm!(N::Int64, α::Float64, β::Float64, Δ::AbstractArray
     end
 end
 
-#= Evaluate ln(|Σ|) for q>0 and q=0, respectively =#
+
+
+#= Evaluate ln(|Σ|) and its derivatives for q>0 and q=0, respectively: =#
+
 log_det(N::Int64, α::Float64, q::Float64) = N*log(α) + (N+1)*log(0.5*(1+q)) + log(abs(1 - ((1-q)/(1+q))^(N+1))) - log(q)
 log_det(N::Int64, α::Float64) = log(N+1) + N*log(0.5*α)
 
@@ -46,7 +46,3 @@ end
 
 dlog_det(N::Int64, α::Float64, β::Float64, q::Float64, ϕ::Float64) = N*(α - 1.0)/(α*ϕ) - F(N,α,β,q)
 ddlog_det(N::Int64, α::Float64, β::Float64, q::Float64, ϕ::Float64) = - N*(α - 1.0)^2/(α*ϕ)^2 - dF(N,α,β,q,ϕ)
-
-
-
-end

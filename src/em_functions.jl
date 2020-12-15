@@ -1,24 +1,5 @@
-# Code for estimating translational diffusion coefficients from experimental single-particle tracking data
-# version 1.0 (14/12/2020)
-# Jakob Tómas Bullerjahn (jabuller@biophys.mpg.de)
-# Gerhard Hummer
+#= Update T using the parameter values stored in the array 'parameters': =#
 
-# Please read and cite the associated publication: 
-# J. T. Bullerjahn and G. Hummer, "Maximum likelihood estimates of diffusion coefficients from single-molecule tracking experiments", https://arxiv.org/abs/2011.09955
-
-module DiffusionEM
-
-using Base.Threads, LinearAlgebra, Optim, ProgressMeter
-# Local modules:
-using BasicFunctions
-
-export global_EM_estimator, local_EM_estimator!
-
-
-
-#= FUNCTIONS FOR EXPECTATION-MAXIMIZATION ALGORITHM: =#
-
-#= Update T using the parameter values stored in the array 'parameters' =#
 function expectation_step!(d::Int64, M::Int64, K::Int64, N::Array{Int64,1}, parameters::Array{Float64,2}, B::AbstractArray{Float64,1}, Δ::Array{Array{Float64,2},1}, c::Array{Array{Float64,1},2}, Y::Array{Array{Float64,1},2}, T::Array{Float64,2})
     @threads for m = 1 : M
         normalization = 0.0
@@ -68,7 +49,10 @@ function expectation_step!(d::Int64, M::Int64, K::Int64, N::Array{Int64,1}, para
     end
 end
 
-#= Evaluate the boundary solutions =#
+
+
+#= Evaluate the boundary solutions: =#
+
 function a2_MLE(d::Int64, M::Int64, C_k::Float64, N::Array{Int64,1}, Δ::Array{Array{Float64,2},1}, c::AbstractArray{Array{Float64,1},1}, Y::AbstractArray{Array{Float64,1},1}, T::AbstractArray{Float64,1})
     ΔΣ_invΔ = 0.0
     logdet = 0.0
@@ -106,7 +90,10 @@ function σ2_MLE(d::Int64, M::Int64, C_k::Float64, N::Array{Int64,1}, B::Abstrac
     return ([0.0,σ2],L)
 end
 
-#= Search for a general (a2>0,σ2>0)-solution =#
+
+
+#= Search for a general (a2>0,σ2>0)-solution: =#
+
 function likelihood(d::Int64, M::Int64, C_k::Float64, N::Array{Int64,1}, ϕ::Float64, B::AbstractArray{Float64,1}, Δ::Array{Array{Float64,2},1}, c::AbstractArray{Array{Float64,1},1}, Y::AbstractArray{Array{Float64,1},1}, T::AbstractArray{Float64,1}, ΔΣ_invΔ::Array{Float64,1})
     ΔΣ_invΔ[1] = 0.0
     logdet = 0.0
@@ -134,7 +121,10 @@ function a2_σ2_MLE(d::Int64, M::Int64, C_k::Float64, N::Array{Int64,1}, B::Abst
     return ([a2,σ2],L)
 end
 
-#= Update parameters using the array T =#
+
+
+#= Update parameters using the array T: =#
+
 function maximization_step!(d::Int64, M::Int64, K::Int64, N_M::Int64, N::Array{Int64,1}, parameters::Array{Float64,2}, B::AbstractArray{Float64,1}, Δ::Array{Array{Float64,2},1}, c::Array{Array{Float64,1},2}, Y::Array{Array{Float64,1},2}, T::Array{Float64,2},interval::Array{Float64,1})
     L = zeros(K)
     TlnPoverT = 0.0
@@ -162,11 +152,11 @@ function maximization_step!(d::Int64, M::Int64, K::Int64, N_M::Int64, N::Array{I
     return (sum(L) - TlnPoverT)/N_M
 end
 
-#= Function executing the expectation-maximization algorithm =#
-function local_EM_estimator!(d::Int64, M::Int64, K::Int64, N_local::Int64, tolerance::Float64, parameters::Array{Float64,2}, B::AbstractArray{Float64,1}, X::AbstractArray{Array{Float64,2},1}, interval::Array{Float64,1}=[0.0,10000.0])
-#    p = Progress(N_local, 1) # set progress meter
-    M = length(X)
-    d = size(X[1],2)
+
+
+#= Functions executing the expectation-maximization algorithm: =#
+
+function local_EM_estimator!(d::Int64, M::Int64, K::Int64, N_local::Int64, parameters::Array{Float64,2}, B::AbstractArray{Float64,1}, X::AbstractArray{Array{Float64,2},1}, tolerance::Float64=10^(-10), interval::Array{Float64,1}=[0.0,10000.0])
     T = zeros(K,M)
     N = zeros(Int64,M)
     Δ = Array{Array{Float64,2},1}(undef, M)
@@ -191,13 +181,12 @@ function local_EM_estimator!(d::Int64, M::Int64, K::Int64, N_local::Int64, toler
         else
             L_old = L_new
         end
-#        next!(p) # update progress meter
     end
-    @warn "Local convergence failure"
+    @warn string("Failed to converge within ", N_local, " iterations")
     return parameters, L_new, T
 end
 
-function global_EM_estimator(K::Int64, N_local::Int64, N_global::Int64, tolerance::Float64, a2_range::Array{Float64,1}, σ2_range::Array{Float64,1}, B::AbstractArray{Float64,1}, X::AbstractArray{Array{Float64,2},1}, interval::Array{Float64,1}=[0.0,10000.0])
+function global_EM_estimator(K::Int64, N_local::Int64, N_global::Int64, a2_range::Array{Float64,1}, σ2_range::Array{Float64,1}, B::AbstractArray{Float64,1}, X::AbstractArray{Array{Float64,2},1}, tolerance::Float64=10^(-10), interval::Array{Float64,1}=[0.0,10000.0])
     p = Progress(N_global, 1) # set progress meter
     M = length(X)
     d = size(X[1],2)
@@ -210,7 +199,7 @@ function global_EM_estimator(K::Int64, N_local::Int64, N_global::Int64, toleranc
         σ2_values = [ rand()*exp(i) for i in range(log(σ2_range[1]), log(σ2_range[2]); length=K) ]
         P_values = [ 1/K for i = 1 : K ]
         parameter_matrix = permutedims(hcat([a2_values,σ2_values,P_values]...))
-        estimates, L_new, T_new = local_EM_estimator!(d,M,K,N_local,tolerance,parameter_matrix,B,X,interval)
+        estimates, L_new, T_new = local_EM_estimator!(d,M,K,N_local,parameter_matrix,B,X,tolerance,interval)
         if L_new < L_old
             L_old = L_new
             parameters .= parameter_matrix
@@ -223,5 +212,30 @@ end
 
 
 
-end # module
+#= Sort trajectories according to their classification coefficients: =#
 
+function sort_trajectories(K::Int64, T::Array{Float64,2}, B::AbstractArray{Float64,1}, X::AbstractArray{Array{Float64,2},1})
+    M = length(X)
+    B_sub = [ Array{Float64,1}() for k = 1 : K ]
+    X_sub = [ Array{Array{Float64,2},1}() for k = 1 : K ]
+    @inbounds for m = 1 : M
+        index = findmax(T[:,m])[2]
+        push!(B_sub[index], B[m])
+        push!(X_sub[index], X[m])
+    end
+    return B_sub, X_sub
+end
+
+function subpopulation_analysis(T::Array{Float64,2}, parameters::Array{Float64,2}, B::AbstractArray{Float64,1}, X::AbstractArray{Array{Float64,2},1})
+    K = size(T,1)
+    B_sub, X_sub = sort_trajectories(K,T,B,X)
+    Q_sub = Array{Array{Float64,1},1}(undef,K)
+    @inbounds for k = 1 : K
+        if length(X_sub[k]) == 0
+            Q_sub[k] = []
+        else
+            Q_sub[k] = Q_factor_analysis(B_sub[k],X_sub[k],parameters[1:2,k])
+        end
+    end
+    return Q_sub
+end

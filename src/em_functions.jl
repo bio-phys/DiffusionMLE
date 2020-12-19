@@ -156,7 +156,7 @@ end
 
 #= Functions executing the expectation-maximization algorithm: =#
 
-function local_EM_estimator!(d::Int64, M::Int64, K::Int64, N_local::Int64, parameters::Array{Float64,2}, B::AbstractArray{Float64,1}, X::AbstractArray{Array{Float64,2},1}, tolerance::Float64=10^(-10), interval::Array{Float64,1}=[0.0,10000.0])
+function local_EM_estimator!(d::Int64, M::Int64, K::Int64, N_local::Int64, parameters::Array{Float64,2}, B::AbstractArray{Float64,1}, X::AbstractArray{Array{Float64,2},1}, tolerance::Float64=1.0e-10, interval::Array{Float64,1}=[0.0,10000.0])
     T = zeros(K,M)
     N = zeros(Int64,M)
     Δ = Array{Array{Float64,2},1}(undef, M)
@@ -186,7 +186,7 @@ function local_EM_estimator!(d::Int64, M::Int64, K::Int64, N_local::Int64, param
     return parameters, L_new, T
 end
 
-function global_EM_estimator(K::Int64, N_local::Int64, N_global::Int64, a2_range::Array{Float64,1}, σ2_range::Array{Float64,1}, B::AbstractArray{Float64,1}, X::AbstractArray{Array{Float64,2},1}, tolerance::Float64=10^(-10), interval::Array{Float64,1}=[0.0,10000.0])
+function global_EM_estimator(K::Int64, N_local::Int64, N_global::Int64, a2_range::Array{Float64,1}, σ2_range::Array{Float64,1}, B::AbstractArray{Float64,1}, X::AbstractArray{Array{Float64,2},1}, tolerance::Float64=1.0e-10, interval::Array{Float64,1}=[0.0,10000.0])
     p = Progress(N_global, 1) # set progress meter
     M = length(X)
     d = size(X[1],2)

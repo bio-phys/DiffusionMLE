@@ -81,7 +81,7 @@ estimates, L, T = global_EM_estimator(K=2,N_local=500,N_global=50,a2_range=[0.02
 ```
 Here, we consider `K=2` subpopulations, and reinitiate the parameter search `N_global=50` times with randomly chosen parameters from `a2_range` and `σ2_range`.  If a search does not converge within `N_local=500` steps, it is broken off.  The optional argument `tolerance` is set to `1.0e-10` by default, and determines the convergence rate of local parameter searches.  Analogous to `MLE_estimator`, the function `global_EM_estimator` offers the optional argument `interval` that can be set manually to fix possible convergence issues.  
 
-The output includes the likelihood score `L`, an `estimates` array, where the *i*-th column contains the parameter estimates `[a2, σ2, P]` for the *i*-th subpopulation, and the classification coefficients `T`.  The latter can be used to assigns the trajectories to subpopulations:
+The output includes the likelihood score `L`, an `estimates` array, where the *i*-th column contains the parameter estimates `[a2, σ2, P]` for the *i*-th subpopulation, and the classification coefficients `T`.  The latter can be used to assign the trajectories to subpopulations:
 ```julia
 B_sub, data_sub = sort_trajectories(K=2,T,B,data)
 ```

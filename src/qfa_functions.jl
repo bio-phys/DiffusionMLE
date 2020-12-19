@@ -17,7 +17,11 @@ function Q_factor_analysis(B::AbstractArray{Float64,1}, X::AbstractArray{Array{F
             Thomas_algorithm!(N,α,β,data_vec,c,Y)
             χ2 += dot(data_vec,Y)
         end
-        Q[m] = 1.0 - cdf(Chisq(d*N),χ2)
+        Q_tmp = 1.0 - cdf(Chisq(d*N),χ2)
+        if Q_tmp == 1.0
+            Q_tmp = 0.9999999999999999
+        end
+        Q[m] = Q_tmp
     end
     return Q
 end

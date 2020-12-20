@@ -13,7 +13,7 @@ For more details on the theoretical framework, please refer to the associated pr
 
 Currently, the package is not in a registry.  It must therefore be added by specifying a URL to the repository:
 ```julia
-using Pkg; Pkg.add("https://github.com/bio-phys/DiffusionMLE.jl")
+using Pkg; Pkg.add(url="https://github.com/bio-phys/DiffusionMLE")
 ```
 
 

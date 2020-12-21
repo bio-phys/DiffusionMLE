@@ -15,6 +15,7 @@ Currently, the package is not in a registry.  It must therefore be added by spec
 ```julia
 using Pkg; Pkg.add(url="https://github.com/bio-phys/DiffusionMLE")
 ```
+Users of older software versions may need to wrap the contents of the brackets with `PackageSpec()`.  
 
 
 
@@ -79,7 +80,7 @@ If the data is heterogeneous, it can be analyzed with the function `global_EM_es
 ```julia
 estimates, L, T = global_EM_estimator(K=2,N_local=500,N_global=50,a2_range=[0.02,20.],σ2_range=[0.02,20.],B,data)
 ```
-Here, we consider `K=2` subpopulations, and reinitiate the parameter search `N_global=50` times with randomly chosen parameters from `a2_range` and `σ2_range`.  If a search does not converge within `N_local=500` steps, it is broken off.  The optional argument `tolerance` is set to `1.0e-10` by default, and determines the convergence rate of local parameter searches.  Analogous to `MLE_estimator`, the function `global_EM_estimator` offers the optional argument `interval` that can be set manually to fix possible convergence issues.  
+Here, we consider `K=2` subpopulations, and initiate the parameter search `N_global=50` times with randomly chosen parameters from `a2_range` and `σ2_range`.  If a search does not converge within `N_local=500` steps, it is broken off.  The optional argument `tolerance` is set to `1.0e-10` by default, and determines the convergence rate of local parameter searches.  Analogous to `MLE_estimator`, the function `global_EM_estimator` offers the optional argument `interval` that can be set manually to fix possible convergence issues.  
 
 The output includes the likelihood score `L`, an `estimates` array, where the *i*-th column contains the parameter estimates `[a2, σ2, P]` for the *i*-th subpopulation, and the classification coefficients `T`.  The latter can be used to assign the trajectories to subpopulations:
 ```julia

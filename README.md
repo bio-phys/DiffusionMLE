@@ -54,7 +54,7 @@ using DiffusionMLE
 ```
 The parameters `a2` and `σ2` both have dimension length squared, so if the trajectory coordinates are given in nanometers then said parameters have dimension nanometer squared.  The associated diffusion coefficient is, irrespective of the dimension *d*, given by
 ```julia
-D = 0.5*σ2*Δt
+D = 0.5*σ2/Δt
 ```
 The `MLE_errors` function provides an estimate of the parameter uncertainties:
 ```julia

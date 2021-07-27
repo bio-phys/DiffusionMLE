@@ -37,6 +37,7 @@ Next to the trajectories, we also need an array of blurring coefficients that sh
 ```julia
 B = [1/6 for m = 1 : length(data)]
 ```
+If the code is used to analyze simulation data with perfect time resolution, the blurring coefficients should be set to zero.  
 
 
 

@@ -4,9 +4,9 @@ This package provides an efficient maximum likelihood estimator to extract diffu
 
 In case of heterogeneous data, i.e., data originating from subpopulations with differing diffusion coefficients, we provide an expectation-maximization algorithm that assigns the trajectories to subpopulations in a probabilistic manner.  The optimal number of subpopulations is determined with the help of a quality factor of known analytical distribution. 
 
-For more details on the theoretical framework, please refer to the associated preprint:
-> J. T. Bullerjahn and G. Hummer, "Maximum likelihood estimates of diffusion coefficients from single-molecule tracking experiments", https://arxiv.org/abs/2011.09955
-
+For more details on the theoretical framework, please refer to the associated open access publication:
+> J. T. Bullerjahn and G. Hummer, "Maximum likelihood estimates of diffusion coefficients from single-particle tracking experiments", *Journal of Chemical Physics* **154**, 234105 (2021).  https://doi.org/10.1063/5.0038174
+Please cite this reference if you use DiffusionMLE to analyze your data.  
 
 
 ## Installation
@@ -29,7 +29,7 @@ Your data can, e.g., be read in as follows:
 ```julia
 using DelimitedFiles
 
-file_names = readdir("~/trajectories/")
+file_names = readdir("./trajectories/")
 data = [ readdlm(file_names[i]) for i = 1 : length(file_names) ]
 ```
 Next to the trajectories, we also need an array of blurring coefficients that should be equal in length to `data`.  If the illumination profile of the shutter is uniform, we can simply use
@@ -41,7 +41,7 @@ B = [1/6 for m = 1 : length(data)]
 
 ### Homogeneous data
 
-Assuming that the data is homogeneous, we can estimate the parameters `a2` and `σ2` using the `MLE_estimator` function:
+Assuming that the data are homogeneous, we can estimate the parameters `a2` and `σ2` using the `MLE_estimator` function:
 ```julia
 using DiffusionMLE
 
@@ -76,7 +76,7 @@ using Base.Threads; nthreads()
 ```
 This should print the number `n` if the above-mentioned command was properly executed.  
 
-If the data is heterogeneous, it can be analyzed with the function `global_EM_estimator` as follows:
+If the data are heterogeneous, it can be analyzed with the function `global_EM_estimator` as follows:
 ```julia
 estimates, L, T = global_EM_estimator(K=2,N_local=500,N_global=50,a2_range=[0.02,20.],σ2_range=[0.02,20.],B,data)
 ```

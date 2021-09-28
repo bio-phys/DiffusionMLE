@@ -7,7 +7,7 @@ In case of heterogeneous data, i.e., data originating from subpopulations with d
 For more details on the theoretical framework, please refer to the associated open access publication:
 > J. T. Bullerjahn and G. Hummer, "Maximum likelihood estimates of diffusion coefficients from single-particle tracking experiments", *Journal of Chemical Physics* **154**, 234105 (2021).  https://doi.org/10.1063/5.0038174
 
-Please cite this reference if you use DiffusionMLE to analyze your data.  
+Please cite this reference if you use `DiffusionMLE` to analyze your data.  
 
 
 ## Installation
